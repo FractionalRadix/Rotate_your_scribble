@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.PointF
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
@@ -13,32 +14,7 @@ import android.view.View
  */
 class RotatedScribbleView : View {
 
-    private var _exampleColor: Int = Color.RED // TODO: use a default from R.color...
-    private var _exampleDimension: Float = 0f // TODO: use a default from R.dimen...
-
-
-    /**
-     * The font color
-     */
-    var exampleColor: Int
-        get() = _exampleColor
-        set(value) {
-            _exampleColor = value
-        }
-
-    /**
-     * In the example view, this dimension is the font size.
-     */
-    var exampleDimension: Float
-        get() = _exampleDimension
-        set(value) {
-            _exampleDimension = value
-        }
-
-    /**
-     * In the example view, this drawable is drawn above the text.
-     */
-    var exampleDrawable: Drawable? = null
+    private var basePoints = mutableListOf<PointF>()
 
     constructor(context: Context) : super(context) {
         init(null, 0)
@@ -62,24 +38,6 @@ class RotatedScribbleView : View {
             attrs, R.styleable.RotatedScribbleView, defStyle, 0
         )
 
-        _exampleColor = a.getColor(
-            R.styleable.RotatedScribbleView_exampleColor2,
-            exampleColor
-        )
-        // Use getDimensionPixelSize or getDimensionPixelOffset when dealing with
-        // values that should fall on pixel boundaries.
-        _exampleDimension = a.getDimension(
-            R.styleable.RotatedScribbleView_exampleDimension2,
-            exampleDimension
-        )
-
-        if (a.hasValue(R.styleable.RotatedScribbleView_exampleDrawable2)) {
-            exampleDrawable = a.getDrawable(
-                R.styleable.RotatedScribbleView_exampleDrawable2
-            )
-            exampleDrawable?.callback = this
-        }
-
         a.recycle()
     }
 
@@ -96,19 +54,27 @@ class RotatedScribbleView : View {
         val contentWidth = width - paddingLeft - paddingRight
         val contentHeight = height - paddingTop - paddingBottom
 
-        // Draw the example drawable on top of the text.
-        exampleDrawable?.let {
-            it.setBounds(
-                paddingLeft, paddingTop,
-                paddingLeft + contentWidth, paddingTop + contentHeight
-            )
-            it.draw(canvas)
-        }
 
+        //TODO!~ Rotate the scribble and draw it...
+        // Maybe we should do the rotating in "setPoints"...
         val greenPaint = Paint()
         greenPaint.color = Color.GREEN
         greenPaint.style = Paint.Style.FILL_AND_STROKE
         canvas.drawCircle(40f, 40f, 30f, greenPaint)
 
+        //TODO!~ We shouldn't draw the "basePoints", but the ROTATED points...
+        if (basePoints.any()) {
+            var prevPoint = basePoints[0]
+            for (pointIdx in 1 until basePoints.size) {
+                var curPoint = basePoints[pointIdx]
+                canvas.drawLine(prevPoint.x, prevPoint.y, curPoint.x, curPoint.y, greenPaint)
+                prevPoint = curPoint
+            }
+        }
+    }
+
+    fun setPoints(points: MutableList<PointF>) {
+        basePoints = points
+        invalidate()
     }
 }
