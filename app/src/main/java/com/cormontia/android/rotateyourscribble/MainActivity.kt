@@ -14,18 +14,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        //TODO?~ Check if these variables need to be members instead of values local to `onCreate`.
-        val flatScribbleView = findViewById<FlatScribbleView>(R.id.flatScribbleView)
         val rotatedScribbleView = findViewById<RotatedScribbleView>(R.id.rotatedScribbleview)
 
-        viewModel.points3.observe(this) { list ->
-            flatScribbleView.setPoints(list);
+        viewModel.points.observe(this) { list ->
             rotatedScribbleView.setPoints(list)
         }
     }
 
     fun accept(points: MutableList<PointF>) {
-        Log.i("MainActivity", "Sending points to ViewModel: $points")
         viewModel.accept(points)
     }
 }
