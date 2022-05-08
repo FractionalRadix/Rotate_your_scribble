@@ -14,8 +14,7 @@ class Mat44 {
             val res = Mat44()
             for (row in 0..3) {
                 for (col in 0..3) {
-                    // OLD CODE: res.set(row, col, Vec4.multiply(a.getRow(row), b.getColumn(col)!!))
-                    res[row,col] = Vec4.multiply(a.getRow(row), b.getColumn(col)!!)
+                    res[row,col] = a.getRow(row) * b.getColumn(col)!!
                 }
             }
             return res
@@ -41,13 +40,14 @@ class Mat44 {
         return elements[row][column]
     }
 
+    //TODO?~ See if we can turn this into an operator overload.
     /**
      * Determine <CODE>this * v</CODE>.
      */
     fun multiply(v: Vec4): Vec4 {
         val res = Vec4(0.0, 0.0, 0.0, 0.0)
         for (row in 0..3) {
-            res[row] = Vec4.multiply(getRow(row), v)
+            res[row] = getRow(row) * v
         }
         return res
     }
@@ -55,7 +55,7 @@ class Mat44 {
     /**
      * Determine <CODE>this * [0,0,0,1]</CODE>.
      */
-    fun multiplyOrigin(): Vec4? {
+    fun multiplyOrigin(): Vec4 {
         return Vec4(getRow(0)[3], getRow(1)[3], getRow(2)[3], getRow(3)[3])
     }
 
@@ -83,8 +83,7 @@ class Mat44 {
         val res: Mat44 = Mat44()
         for (row in 0..3) {
             for (col in 0..3) {
-                // OLD CODE: res.set(row, col, Vec4.multiply(this.getRow(row), that.getColumn(col)!!))
-                res[row,col] = Vec4.multiply(this.getRow(row), that.getColumn(col)!!)
+                res[row,col] = this.getRow(row) * that.getColumn(col)!!
             }
         }
         return res
