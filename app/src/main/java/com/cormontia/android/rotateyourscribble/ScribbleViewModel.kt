@@ -13,8 +13,19 @@ class ScribbleViewModel : ViewModel() {
         points.value = points_backingField
     }
 
+    var centerX = 0.0 // Placeholder value, since primitive types cannot use "lateinit".
+        private set;
+
+    var centerY = 0.0 // Placeholder value, since primitive types cannot use "lateinit".
+        private set;
+
     fun accept(newPoints: MutableList<PointF>) {
         points_backingField.addAll(newPoints)
         points.value = points_backingField
+    }
+
+    fun setCenter(centerX: Double, centerY: Double) {
+        this.centerX = centerX
+        this.centerY = centerY
     }
 }

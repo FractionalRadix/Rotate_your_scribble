@@ -3,6 +3,7 @@ package com.cormontia.android.rotateyourscribble
 import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 
@@ -19,6 +20,9 @@ class FlatScribbleView : View {
      * But in a small app such as this, that is just overhead.
      */
     private val localPointsStore = mutableListOf<PointF>()
+
+    var centerX = 0.0 // Placeholder value, since primitive values do not support "lateinit".
+    var centerY = 0.0 // Placeholder value, since primitive values do not support "lateinit".
 
     private val blackPaint = Paint()
     init {
@@ -53,15 +57,31 @@ class FlatScribbleView : View {
 
     //TODO?~ Do this more neat, by making MainActivity implement an interface that accepts points lists.
     // Then we can simply check if "context" implements that interface, and if so, use it.
-    private fun sendPointsToContext(points: MutableList<PointF>) {
+    private fun sendPointsToContext(points: MutableList<PointF>, centerX: Double, centerY: Double) {
         if (context is MainActivity) {
             val activity = context as MainActivity
             activity.accept(points)
+            activity.setCenter(centerX, centerY) //TODO!~ Move this to a caller of its own, to make this call only once.
         }
     }
 
     override fun onDraw(canvas: Canvas) {
+
         super.onDraw(canvas)
+
+        //TODO! Calculate these values only once and cache them.
+
+        val paddingLeft = paddingLeft
+        val paddingRight = paddingRight
+        val contentWidth = width - paddingLeft - paddingRight
+        centerX = (contentWidth / 2).toDouble()
+
+        val paddingTop = paddingTop
+        val paddingBottom = paddingBottom
+        val contentHeight = height - paddingTop - paddingBottom
+        centerY = (contentHeight / 2).toDouble()
+
+
 
         if (localPointsStore.any()) {
             var prevPoint = localPointsStore[0]
@@ -84,7 +104,7 @@ class FlatScribbleView : View {
         }
         points.add(PointF(evt.x, evt.y))
         localPointsStore.add(PointF(evt.x, evt.y))
-        sendPointsToContext(points)
+        sendPointsToContext(points, centerX, centerY)
 
         invalidate()
 

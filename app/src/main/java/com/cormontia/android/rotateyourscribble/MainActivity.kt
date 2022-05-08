@@ -16,12 +16,18 @@ class MainActivity : AppCompatActivity() {
 
         val rotatedScribbleView = findViewById<RotatedScribbleView>(R.id.rotatedScribbleview)
 
-        viewModel.points.observe(this) { list ->
-            rotatedScribbleView.setPoints(list)
+        viewModel.points.observe(this) {
+                list -> rotatedScribbleView.setPoints(list)
+                //TODO?~ Put this in an observer of its own? It needs to be done only once. Maybe not even something for an observer!
+                rotatedScribbleView.setCenter(viewModel.centerX, viewModel.centerY)
         }
     }
 
     fun accept(points: MutableList<PointF>) {
         viewModel.accept(points)
+    }
+
+    fun setCenter(centerX: Double, centerY: Double) {
+        viewModel.setCenter(centerX, centerY)
     }
 }

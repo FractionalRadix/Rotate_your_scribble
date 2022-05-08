@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PointF
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
 import com.cormontia.android.rotateyourscribble.matrix3d.MatrixFactory
 import com.cormontia.android.rotateyourscribble.matrix3d.Vec4
@@ -17,6 +18,9 @@ class RotatedScribbleView : View {
 
     private var basePoints = mutableListOf<PointF>()
     private var rotatedLines = listOf<List<PointF>>()
+
+    private var centerY = 0.0 // Placeholder value, since lateinit is not allowed on primitive types.
+    private var centerX = 0.0 // Placeholder value, since lateinit is not allowed on primitive types.
 
     private val blackPaint = Paint()
     init {
@@ -52,6 +56,26 @@ class RotatedScribbleView : View {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+
+        /*
+        //TODO!- This should come from the ViewModel.
+        val paddingLeft = paddingLeft
+        val paddingRight = paddingRight
+        val contentWidth = width - paddingLeft - paddingRight
+        centerX = (contentWidth / 2).toDouble()
+
+        //TODO!- This should come from the ViewModel.
+        val paddingTop = paddingTop
+        val paddingBottom = paddingBottom
+        val contentHeight = height - paddingTop - paddingBottom
+        centerY = (contentHeight / 2).toDouble()
+         */
+
+
+        //Log.i("RotatedScribbleView", "${paddingTop}/${contentHeight}/${paddingBottom} centerY==${centerY}")
+        //Log.i("RotatedScribbleView", "${paddingLeft}/${contentWidth}/${paddingRight} centerX==${centerX}")
+
+
         for (line in rotatedLines) {
             drawPointList(canvas, line)
         }
@@ -74,11 +98,13 @@ class RotatedScribbleView : View {
         invalidate()
     }
 
+    fun setCenter(centerX: Double, centerY: Double) {
+        this.centerX = centerX
+        this.centerY = centerY
+    }
+
     private fun rotate(points: MutableList<PointF>) : List<List<PointF>> {
         val rotatedLines = mutableListOf<MutableList<PointF>>()
-
-        val centerX = 150.0 //TODO!~ This value should come from ScribbleViewModel...
-        val centerY = 150.0 //TODO!~ This value also should come from ScribbleViewModel.
 
         val translateBefore = MatrixFactory.Translate(-centerX, -centerY, 0.0)
         val translateAfter = MatrixFactory.Translate(+centerX, +centerY, 0.0)
