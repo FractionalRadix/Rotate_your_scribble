@@ -1,5 +1,6 @@
 package com.cormontia.android.rotateyourscribble
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -8,6 +9,7 @@ import android.graphics.PointF
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import android.view.animation.LinearInterpolator
 import com.cormontia.android.rotateyourscribble.matrix3d.MatrixFactory
 import com.cormontia.android.rotateyourscribble.matrix3d.Vec4
 
@@ -27,6 +29,11 @@ class RotatedScribbleView : View {
         blackPaint.color = Color.BLACK
         blackPaint.style = Paint.Style.FILL_AND_STROKE
     }
+
+    //private val anim = ValueAnimator() // TODO?~ Use ".ofFloat(...)" or ".ofInt(...)" ?
+    private val anim = ValueAnimator.ofFloat(0.0f, (2.0f * Math.PI).toFloat())
+    private var zRotation = 0.0f
+
 
     constructor(context: Context) : super(context) {
         init(null, 0)
@@ -51,30 +58,21 @@ class RotatedScribbleView : View {
         )
 
         a.recycle()
+
+        anim.addUpdateListener {
+            zRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
+            rotatedLines = rotate(basePoints)
+            invalidate()
+            Log.i("RotatedScribbleView", "animation at $zRotation")
+        }
+        //anim.interpolator = DecelerateInterpolator()
+        anim.interpolator = LinearInterpolator()
+        anim.duration = 2000 // Should be in microseconds...
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-
-        /*
-        //TODO!- This should come from the ViewModel.
-        val paddingLeft = paddingLeft
-        val paddingRight = paddingRight
-        val contentWidth = width - paddingLeft - paddingRight
-        centerX = (contentWidth / 2).toDouble()
-
-        //TODO!- This should come from the ViewModel.
-        val paddingTop = paddingTop
-        val paddingBottom = paddingBottom
-        val contentHeight = height - paddingTop - paddingBottom
-        centerY = (contentHeight / 2).toDouble()
-         */
-
-
-        //Log.i("RotatedScribbleView", "${paddingTop}/${contentHeight}/${paddingBottom} centerY==${centerY}")
-        //Log.i("RotatedScribbleView", "${paddingLeft}/${contentWidth}/${paddingRight} centerX==${centerX}")
-
+        Log.i("RotatedScribbleView", "In onDraw(Canvas) method.")
 
         for (line in rotatedLines) {
             drawPointList(canvas, line)
@@ -96,6 +94,7 @@ class RotatedScribbleView : View {
         basePoints = points
         rotatedLines = rotate(basePoints)
         invalidate()
+        anim.start()
     }
 
     fun setCenter(centerX: Double, centerY: Double) {
@@ -111,7 +110,9 @@ class RotatedScribbleView : View {
         for (angleInDegrees in 0 until 360 step 5) {
             val angleInRadians = Math.toRadians(angleInDegrees.toDouble())
             val rotation = MatrixFactory.RotateAroundY(angleInRadians)
-            val fullMatrix = translateAfter * rotation * translateBefore
+            //val fullMatrix = translateAfter * rotation * translateBefore
+            val animationRotation = MatrixFactory.RotateAroundX(zRotation.toDouble())
+            val fullMatrix = translateAfter * animationRotation * rotation * translateBefore
 
             val rotatedLine = mutableListOf<PointF>()
             for (point in points) {
