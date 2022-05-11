@@ -127,7 +127,6 @@ class RotatedScribbleView : View {
         basePoints = points
         rotatedLines = rotate(basePoints)
         invalidate()
-        //anim.start()
     }
 
     fun setCenter(centerX: Double, centerY: Double) {

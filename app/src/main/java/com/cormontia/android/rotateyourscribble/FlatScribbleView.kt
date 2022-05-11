@@ -110,4 +110,9 @@ class FlatScribbleView : View {
 
         return true
     }
+
+    fun clear() {
+        localPointsStore.clear()
+        invalidate()
+    }
 }

@@ -28,4 +28,9 @@ class ScribbleViewModel : ViewModel() {
         this.centerX = centerX
         this.centerY = centerY
     }
+
+    fun clear() {
+        points_backingField.clear()
+        points.value = points_backingField
+    }
 }
