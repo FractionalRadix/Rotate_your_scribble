@@ -15,9 +15,6 @@ class FlatScribbleView : View {
 
     /**
      * The list of points that the user has drawn.
-     * Perfect architecture would require us to send this list to the ViewModel, and
-     * then we'd update our View from the notifications that we got from the ViewModel.
-     * But in a small app such as this, that is just overhead.
      */
     private val localPointsStore = mutableListOf<PointF>()
 
@@ -81,8 +78,6 @@ class FlatScribbleView : View {
         val contentHeight = height - paddingTop - paddingBottom
         centerY = (contentHeight / 2).toDouble()
 
-
-
         if (localPointsStore.any()) {
             var prevPoint = localPointsStore[0]
             for (pointIdx in 1 until localPointsStore.size) {
@@ -100,19 +95,16 @@ class FlatScribbleView : View {
         val points = mutableListOf<PointF>()
         for (idx in 0 until evt.historySize) {
             points.add(PointF(evt.getHistoricalX(idx), evt.getHistoricalY(idx)))
-            localPointsStore.add(PointF(evt.getHistoricalX(idx), evt.getHistoricalY(idx)))
         }
         points.add(PointF(evt.x, evt.y))
-        localPointsStore.add(PointF(evt.x, evt.y))
         sendPointsToContext(points, centerX, centerY)
-
-        invalidate()
 
         return true
     }
 
-    fun clear() {
+    fun setPoints(points: MutableList<PointF>) {
         localPointsStore.clear()
+        localPointsStore.addAll(points)
         invalidate()
     }
 }

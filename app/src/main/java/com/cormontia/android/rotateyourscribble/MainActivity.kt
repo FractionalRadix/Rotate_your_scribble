@@ -21,9 +21,12 @@ class MainActivity : AppCompatActivity() {
         flatScribbleView = findViewById<FlatScribbleView>(R.id.flatScribbleView)
 
         viewModel.points.observe(this) {
-                list -> rotatedScribbleView.setPoints(list)
-                //TODO?~ Put this in an observer of its own? It needs to be done only once. Maybe not even something for an observer!
-                rotatedScribbleView.setCenter(viewModel.centerX, viewModel.centerY)
+            list -> run {
+                rotatedScribbleView.setPoints(list)
+                flatScribbleView.setPoints(list)
+            }
+            //TODO?~ Put this in an observer of its own? It needs to be done only once. Maybe not even something for an observer!
+            rotatedScribbleView.setCenter(viewModel.centerX, viewModel.centerY)
         }
 
         findViewById<ImageButton>(R.id.clearButton).setOnClickListener{ clear() }
@@ -44,8 +47,6 @@ class MainActivity : AppCompatActivity() {
     private fun clear() {
         Log.i("MainActivity", "Hit Clear button.")
         viewModel.clear()
-        //TODO!~ FlatScribbleView should be updated from the ViewModel after all...
-        flatScribbleView.clear()
     }
 
     private fun load() {
