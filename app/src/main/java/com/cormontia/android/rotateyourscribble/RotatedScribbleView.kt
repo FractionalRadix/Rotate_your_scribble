@@ -23,8 +23,10 @@ import kotlin.math.abs
 class RotatedScribbleView : View {
 
     private var basePoints = mutableListOf<PointF>()
+    private var frame3D = listOf<List<Vec4>>()
     private var rotatedLines = listOf<List<PointF>>()
 
+    //TODO?~ These aren't always initialized in time....
     private var centerY = 0.0 // Placeholder value, since lateinit is not allowed on primitive types.
     private var centerX = 0.0 // Placeholder value, since lateinit is not allowed on primitive types.
 
@@ -71,7 +73,7 @@ class RotatedScribbleView : View {
 
         leftwardAnimator.addUpdateListener {
             yRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
-            rotatedLines = rotate(basePoints)
+            rotatedLines = rotate3DModel(frame3D, 0.0, yRotation.toDouble())
             invalidate()
         }
         leftwardAnimator.interpolator = DecelerateInterpolator()
@@ -79,7 +81,7 @@ class RotatedScribbleView : View {
 
         rightwardAnimator.addUpdateListener {
             yRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
-            rotatedLines = rotate(basePoints)
+            rotatedLines = rotate3DModel(frame3D,0.0, yRotation.toDouble())
             invalidate()
         }
         rightwardAnimator.interpolator = DecelerateInterpolator()
@@ -87,7 +89,7 @@ class RotatedScribbleView : View {
 
         upwardAnimator.addUpdateListener {
             xRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
-            rotatedLines = rotate(basePoints)
+            rotatedLines = rotate3DModel(frame3D, xRotation.toDouble(), 0.0)
             invalidate()
         }
         upwardAnimator.interpolator = DecelerateInterpolator()
@@ -95,7 +97,7 @@ class RotatedScribbleView : View {
 
         downwardAnimator.addUpdateListener {
             xRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
-            rotatedLines = rotate(basePoints)
+            rotatedLines = rotate3DModel(frame3D, xRotation.toDouble(), 0.0)
             invalidate()
         }
         downwardAnimator.interpolator = DecelerateInterpolator()
@@ -125,7 +127,8 @@ class RotatedScribbleView : View {
 
     fun setPoints(points: MutableList<PointF>) {
         basePoints = points
-        rotatedLines = rotate(basePoints)
+        frame3D = rotateScribble(basePoints)
+        rotatedLines = rotate3DModel(frame3D, 0.0, 0.0)
         invalidate()
     }
 
@@ -134,28 +137,55 @@ class RotatedScribbleView : View {
         this.centerY = centerY
     }
 
-    private fun rotate(points: MutableList<PointF>) : List<List<PointF>> {
-        val rotatedLines = mutableListOf<MutableList<PointF>>()
 
+    //TODO!~ Move this method to the ViewModel.
+    /**
+     * Turn a scribble into a 3D model, by rotating it around the center.
+     */
+    private fun rotateScribble(points: List<PointF>): List<List<Vec4>> {
+        val rotatedLines = mutableListOf<MutableList<Vec4>>()
+
+        //TODO!~ Make these two center values independent, because this method is going to be moved to the ViewModel!
         val translateBefore = MatrixFactory.Translate(-centerX, -centerY, 0.0)
         val translateAfter = MatrixFactory.Translate(+centerX, +centerY, 0.0)
+
         for (angleInDegrees in 0 until 360 step 5) {
             val angleInRadians = Math.toRadians(angleInDegrees.toDouble())
             val rotation = MatrixFactory.RotateAroundY(angleInRadians)
 
-            val animationRotationX = MatrixFactory.RotateAroundX(xRotation.toDouble())
-            val animationRotationY = MatrixFactory.RotateAroundY(yRotation.toDouble())
+            val fullMatrix = translateAfter * rotation * translateBefore
 
-            val fullMatrix = translateAfter * animationRotationX * animationRotationY * rotation * translateBefore
-
-            val rotatedLine = mutableListOf<PointF>()
+            val rotatedLine = mutableListOf<Vec4>()
             for (point in points) {
                 val pointAsVector = Vec4(point.x.toDouble(), point.y.toDouble(), 0.0, 1.0)
                 val rotatedPointAsVector = fullMatrix.multiply(pointAsVector)
+                rotatedLine.add(rotatedPointAsVector)
+            }
+
+            rotatedLines.add(rotatedLine)
+        }
+        return rotatedLines
+    }
+
+    //TODO?~ Parameterize xRotation and yRotation?
+    /**
+     * Rotate a 3D model around the x-axis and the y-axis.
+     */
+    private fun rotate3DModel(lines: List<List<Vec4>>, xRotation: Double, yRotation: Double): List<List<PointF>> {
+        val translateBefore = MatrixFactory.Translate(-centerX, -centerY, 0.0)
+        val translateAfter = MatrixFactory.Translate(+centerX, +centerY, 0.0)
+        val animationRotationX = MatrixFactory.RotateAroundX(xRotation)
+        val animationRotationY = MatrixFactory.RotateAroundY(yRotation)
+        val fullMatrix = translateAfter * animationRotationX * animationRotationY * translateBefore
+
+        val rotatedLines = mutableListOf<MutableList<PointF>>()
+        for (line in lines) {
+            val rotatedLine = mutableListOf<PointF>()
+            line.listIterator().forEach {
+                val rotatedPointAsVector = fullMatrix.multiply(it)
                 val rotatedPoint = PointF(rotatedPointAsVector[0].toFloat(), rotatedPointAsVector[1].toFloat())
                 rotatedLine.add(rotatedPoint)
             }
-
             rotatedLines.add(rotatedLine)
         }
         return rotatedLines

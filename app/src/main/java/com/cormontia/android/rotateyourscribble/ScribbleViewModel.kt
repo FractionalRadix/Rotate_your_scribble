@@ -45,6 +45,7 @@ class ScribbleViewModel : ViewModel() {
         return serialization
     }
 
+    //TODO?~ Make this static (i.e. put it in a companion object?) Note that "serialize" should NOT be static!
     fun deserializePointsList(stringList: List<String>): List<PointF> {
         val points = mutableListOf<PointF>()
         for (point in stringList) {
@@ -58,5 +59,14 @@ class ScribbleViewModel : ViewModel() {
             }
         }
         return points
+    }
+
+    /**
+     * Transform the 3D figure to the WaveFront .OBJ format.
+     */
+    fun toWavefrontFormat(): List<String> {
+        val wavefront = mutableListOf<String>()
+        //TODO!+
+        return wavefront
     }
 }

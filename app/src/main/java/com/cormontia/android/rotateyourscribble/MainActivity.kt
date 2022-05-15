@@ -103,6 +103,7 @@ class MainActivity : AppCompatActivity() {
                         .filter { !it.isNullOrBlank() }
                         .toList()
                     val points = viewModel.deserializePointsList(stringList)
+                    viewModel.clear()
                     viewModel.accept(points as MutableList<PointF>)
                 }
             }
@@ -124,6 +125,12 @@ class MainActivity : AppCompatActivity() {
             }
             exportCode -> {
                 if (uri != null) {
+                    //TODO!+ Handle FileNotFoundException and IOException
+                    val contentResolver = applicationContext.contentResolver
+                    val parcelFileDescriptor = contentResolver.openFileDescriptor(uri, "w")
+                    val fileWriter = FileWriter(parcelFileDescriptor?.fileDescriptor)
+                    val bufferedWriter = BufferedWriter(fileWriter)
+
                     //TODO!+ Export to WaveFront.OBJ format
                 }
             }
