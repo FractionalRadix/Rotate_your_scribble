@@ -3,6 +3,8 @@ package com.cormontia.android.rotateyourscribble
 import android.graphics.PointF
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.cormontia.android.rotateyourscribble.matrix3d.MatrixFactory
+import com.cormontia.android.rotateyourscribble.matrix3d.Vec4
 
 class ScribbleViewModel : ViewModel() {
 
@@ -14,6 +16,9 @@ class ScribbleViewModel : ViewModel() {
         points.value = points_backingField
     }
 
+    //TODO?~ Should this be LiveData too?
+    var threeDimensionalModel = listOf<List<Vec4>>()
+
     var centerX = 0.0 // Placeholder value, since primitive types cannot use "lateinit".
         private set
 
@@ -24,6 +29,8 @@ class ScribbleViewModel : ViewModel() {
     fun accept(newPoints: MutableList<PointF>) {
         points_backingField.addAll(newPoints)
         points.value = points_backingField
+
+        threeDimensionalModel = rotateScribble(points_backingField)
     }
 
     fun setCenter(centerX: Double, centerY: Double) {
@@ -59,6 +66,34 @@ class ScribbleViewModel : ViewModel() {
             }
         }
         return points
+    }
+
+    /**
+     * Turn a scribble into a 3D model, by rotating it around the center.
+     */
+    private fun rotateScribble(points: List<PointF>): List<List<Vec4>> {
+        val rotatedLines = mutableListOf<MutableList<Vec4>>()
+
+        //TODO!~ Make these two center values independent, because this method is going to be moved to the ViewModel!
+        val translateBefore = MatrixFactory.Translate(-centerX, -centerY, 0.0)
+        val translateAfter = MatrixFactory.Translate(+centerX, +centerY, 0.0)
+
+        for (angleInDegrees in 0 until 360 step 5) {
+            val angleInRadians = Math.toRadians(angleInDegrees.toDouble())
+            val rotation = MatrixFactory.RotateAroundY(angleInRadians)
+
+            val fullMatrix = translateAfter * rotation * translateBefore
+
+            val rotatedLine = mutableListOf<Vec4>()
+            for (point in points) {
+                val pointAsVector = Vec4(point.x.toDouble(), point.y.toDouble(), 0.0, 1.0)
+                val rotatedPointAsVector = fullMatrix.multiply(pointAsVector)
+                rotatedLine.add(rotatedPointAsVector)
+            }
+
+            rotatedLines.add(rotatedLine)
+        }
+        return rotatedLines
     }
 
     /**

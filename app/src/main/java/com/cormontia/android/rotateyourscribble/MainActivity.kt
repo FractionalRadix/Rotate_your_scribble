@@ -25,11 +25,14 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.points.observe(this) {
             list -> run {
+                //TODO?~ Put this in an observer of its own? It needs to be done only once. Maybe not even something for an observer!
+                rotatedScribbleView.setCenter(viewModel.centerX, viewModel.centerY)
+
                 rotatedScribbleView.setPoints(list)
                 flatScribbleView.setPoints(list)
+
+                rotatedScribbleView.set3DModel(viewModel.threeDimensionalModel)
             }
-            //TODO?~ Put this in an observer of its own? It needs to be done only once. Maybe not even something for an observer!
-            rotatedScribbleView.setCenter(viewModel.centerX, viewModel.centerY)
         }
 
         findViewById<ImageButton>(R.id.clearButton).setOnClickListener{ clear() }

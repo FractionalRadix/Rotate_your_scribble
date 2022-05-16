@@ -125,46 +125,19 @@ class RotatedScribbleView : View {
         }
     }
 
-    fun setPoints(points: MutableList<PointF>) {
-        basePoints = points
-        frame3D = rotateScribble(basePoints)
-        rotatedLines = rotate3DModel(frame3D, 0.0, 0.0)
-        invalidate()
-    }
-
     fun setCenter(centerX: Double, centerY: Double) {
         this.centerX = centerX
         this.centerY = centerY
     }
 
+    fun setPoints(points: MutableList<PointF>) {
+        basePoints = points
+        rotatedLines = rotate3DModel(frame3D, 0.0, 0.0)
+        invalidate()
+    }
 
-    //TODO!~ Move this method to the ViewModel.
-    /**
-     * Turn a scribble into a 3D model, by rotating it around the center.
-     */
-    private fun rotateScribble(points: List<PointF>): List<List<Vec4>> {
-        val rotatedLines = mutableListOf<MutableList<Vec4>>()
-
-        //TODO!~ Make these two center values independent, because this method is going to be moved to the ViewModel!
-        val translateBefore = MatrixFactory.Translate(-centerX, -centerY, 0.0)
-        val translateAfter = MatrixFactory.Translate(+centerX, +centerY, 0.0)
-
-        for (angleInDegrees in 0 until 360 step 5) {
-            val angleInRadians = Math.toRadians(angleInDegrees.toDouble())
-            val rotation = MatrixFactory.RotateAroundY(angleInRadians)
-
-            val fullMatrix = translateAfter * rotation * translateBefore
-
-            val rotatedLine = mutableListOf<Vec4>()
-            for (point in points) {
-                val pointAsVector = Vec4(point.x.toDouble(), point.y.toDouble(), 0.0, 1.0)
-                val rotatedPointAsVector = fullMatrix.multiply(pointAsVector)
-                rotatedLine.add(rotatedPointAsVector)
-            }
-
-            rotatedLines.add(rotatedLine)
-        }
-        return rotatedLines
+    fun set3DModel(model: List<List<Vec4>>) {
+        frame3D = model
     }
 
     //TODO?~ Parameterize xRotation and yRotation?
