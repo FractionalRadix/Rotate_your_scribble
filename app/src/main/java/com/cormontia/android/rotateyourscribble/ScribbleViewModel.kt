@@ -101,7 +101,31 @@ class ScribbleViewModel : ViewModel() {
      */
     fun toWavefrontFormat(): List<String> {
         val wavefront = mutableListOf<String>()
-        //TODO!+
+
+        // Note: vertices should be in CCW order. (CCW is default, that way you don't have to add normals. You still CAN add normals).
+
+        wavefront.add("# Vertices")
+        for (line in threeDimensionalModel) {
+            for (point in line) {
+                val vertexText = "v ${point[0]} ${point[1]} ${point[2]}"
+                wavefront.add(vertexText)
+            }
+        }
+
+        wavefront.add("# Faces")
+        if (threeDimensionalModel.any()) {
+            val nrOfLines = threeDimensionalModel.size
+            val pointsPerLine = threeDimensionalModel[0].size
+            for (i in 0 until pointsPerLine) {
+                val idx0 = (i + 0) + 1    // +1 because vertex indices in WaveFront.OBJ files are 1-based.
+                val idx1 = (i + 1) + 1
+                val idx2 = ((i + pointsPerLine) % nrOfLines) + 1
+                val idx3 = ((i + 1 + pointsPerLine) % nrOfLines) + 1  // Is that correct or will it go out of bounds...
+                val faceText = "f ${idx0} ${idx1} ${idx3} ${idx2}"  // Faces may consist of more than 3 vertices!
+                wavefront.add(faceText)
+            }
+        }
+
         return wavefront
     }
 }

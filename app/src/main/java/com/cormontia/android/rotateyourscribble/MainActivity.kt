@@ -85,6 +85,7 @@ class MainActivity : AppCompatActivity() {
         startActivityForResult(exportIntent, exportCode) //TODO!~ Use "registerForActivityResult" instead.
     }
 
+    private val shareCode = 35
     private fun share() {
         //TODO()
     }
@@ -120,8 +121,8 @@ class MainActivity : AppCompatActivity() {
 
                     bufferedWriter.use {
                         val pointsAsStrings = viewModel.serializePointsList()
-                        pointsAsStrings.forEach { line ->
-                            bufferedWriter.appendLine(line)
+                        pointsAsStrings.forEach {
+                            line -> bufferedWriter.appendLine(line)
                         }
                     }
                 }
@@ -134,8 +135,16 @@ class MainActivity : AppCompatActivity() {
                     val fileWriter = FileWriter(parcelFileDescriptor?.fileDescriptor)
                     val bufferedWriter = BufferedWriter(fileWriter)
 
-                    //TODO!+ Export to WaveFront.OBJ format
+                    val textLines = viewModel.toWavefrontFormat()
+                    bufferedWriter.use {
+                        textLines.forEach {
+                            line -> bufferedWriter.appendLine(line)
+                        }
+                    }
                 }
+            }
+            shareCode -> {
+                //TODO!+
             }
         }
     }
