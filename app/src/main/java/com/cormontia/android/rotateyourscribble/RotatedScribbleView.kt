@@ -7,7 +7,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PointF
 import android.util.AttributeSet
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -22,7 +21,7 @@ import kotlin.math.abs
  */
 class RotatedScribbleView : View {
 
-    private var basePoints = mutableListOf<PointF>()
+    //private var basePoints = mutableListOf<PointF>()
     private var frame3D = listOf<List<Vec4>>()
     private var rotatedLines = listOf<List<PointF>>()
 
@@ -107,7 +106,6 @@ class RotatedScribbleView : View {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        Log.i("RotatedScribbleView", "In onDraw(Canvas) method.")
 
         for (line in rotatedLines) {
             drawPointList(canvas, line)
@@ -130,17 +128,12 @@ class RotatedScribbleView : View {
         this.centerY = centerY
     }
 
-    fun setPoints(points: MutableList<PointF>) {
-        basePoints = points
+    fun set3DModel(model: List<List<Vec4>>) {
+        frame3D = model
         rotatedLines = rotate3DModel(frame3D, 0.0, 0.0)
         invalidate()
     }
 
-    fun set3DModel(model: List<List<Vec4>>) {
-        frame3D = model
-    }
-
-    //TODO?~ Parameterize xRotation and yRotation?
     /**
      * Rotate a 3D model around the x-axis and the y-axis.
      */
@@ -167,7 +160,6 @@ class RotatedScribbleView : View {
     // Gesture detection
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        Log.i("RotatedScribbleView", "Entered onTouchEvent")
         mGestureDetector.onTouchEvent(event)
         if (event != null) {
             if (event.actionMasked == MotionEvent.ACTION_DOWN) {
@@ -183,7 +175,6 @@ class RotatedScribbleView : View {
         //  the system assumes that you want to ignore the rest of the gesture, and the other methods of GestureDetector.OnGestureListener never get called."
         // (Source: https://developer.android.com/training/gestures/detector#detect-a-subset-of-supported-gestures )
         override fun onDown(e: MotionEvent): Boolean {
-            Log.i("RotatedScribbleView.FlingGestureListener", "Entered onDown(...)")
             return true
         }
 
@@ -193,16 +184,13 @@ class RotatedScribbleView : View {
             velocityX: Float,
             velocityY: Float
         ): Boolean {
-            Log.i("RotatedScribbleView.FlingGestureListener", "Entered onFling(...)")
             if (e1 != null && e2 != null) {
                 val rightward = e2.x - e1.x
                 val upward = e2.y - e1.y
                 if (abs(rightward) > abs(upward)) {
                     if (rightward > 0) {
-                        Log.i("RotatedScribbleView", "User flinged to rotate rightward.")
                         rightwardAnimator.start()
                     } else {
-                        Log.i("RotatedScribbleView", "User flinged to rotate leftward.")
                         leftwardAnimator.start()
                     }
                 } else {

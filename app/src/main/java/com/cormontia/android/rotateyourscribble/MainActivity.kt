@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.PointF
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.ImageButton
 import androidx.activity.viewModels
 import java.io.*
@@ -25,11 +24,13 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.points.observe(this) {
             list -> run {
-                //TODO?~ Put this in an observer of its own? It needs to be done only once. Maybe not even something for an observer!
-                rotatedScribbleView.setCenter(viewModel.centerX, viewModel.centerY)
-
-                rotatedScribbleView.setPoints(list)
                 flatScribbleView.setPoints(list)
+
+                //TODO?~ Put this in an observer of its own? It needs to be done only once. Maybe not even something for an observer!
+                // Also, it seems that (centerX, centerY)==(0.0, 0.0) when the first thing you do is load a model.
+                // This happens because these values are calculated in the onDraw() method of FlatScribbleView, which is not yet called at that point.
+
+                rotatedScribbleView.setCenter(viewModel.centerX, viewModel.centerY)
 
                 rotatedScribbleView.set3DModel(viewModel.threeDimensionalModel)
             }
@@ -51,7 +52,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun clear() {
-        Log.i("MainActivity", "Hit Clear button.")
         viewModel.clear()
     }
 

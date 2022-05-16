@@ -66,7 +66,7 @@ class FlatScribbleView : View {
 
         super.onDraw(canvas)
 
-        //TODO! Calculate these values only once and cache them.
+        //TODO!~ Calculate these values only once and cache them.
 
         val paddingLeft = paddingLeft
         val paddingRight = paddingRight

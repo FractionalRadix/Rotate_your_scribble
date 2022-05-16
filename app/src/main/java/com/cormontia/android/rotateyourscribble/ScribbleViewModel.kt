@@ -28,9 +28,8 @@ class ScribbleViewModel : ViewModel() {
     //TODO?~ use List<PointF> as parameter, instead of MutableList<PointF> ?
     fun accept(newPoints: MutableList<PointF>) {
         points_backingField.addAll(newPoints)
-        points.value = points_backingField
-
         threeDimensionalModel = rotateScribble(points_backingField)
+        points.value = points_backingField
     }
 
     fun setCenter(centerX: Double, centerY: Double) {
@@ -40,6 +39,7 @@ class ScribbleViewModel : ViewModel() {
 
     fun clear() {
         points_backingField.clear()
+        threeDimensionalModel = rotateScribble(points_backingField)
         points.value = points_backingField
     }
 
