@@ -87,7 +87,14 @@ class MainActivity : AppCompatActivity() {
 
     private val shareCode = 35
     private fun share() {
-        //TODO()
+        val sharingIntent = Intent(android.content.Intent.ACTION_SEND)
+        sharingIntent.type = "text/plain"   // That apparently really IS the MIME Type for Wavefront.OBJ ....
+        val textLines = viewModel
+            .toWavefrontFormat()
+            .joinToString( separator = "\r\n" )
+        //TODO?~ The amount of data in even a simple scribble, causes the thing to crash... looks like a timeout.
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, textLines)
+        startActivity(Intent.createChooser(sharingIntent, "Share using: "))
     }
 
     @Deprecated("'onActivityResult(Int, Int, Intent?): Unit' is deprecated. Overrides deprecated member in 'androidx.activity.ComponentActivity'. Deprecated in Java")
@@ -143,9 +150,6 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-            }
-            shareCode -> {
-                //TODO!+
             }
         }
     }
