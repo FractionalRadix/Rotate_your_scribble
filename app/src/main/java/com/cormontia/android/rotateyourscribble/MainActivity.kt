@@ -137,6 +137,7 @@ class MainActivity : AppCompatActivity() {
 
                     val textLines = viewModel.toWavefrontFormat()
                     bufferedWriter.use {
+                        //TODO!~ Currently stores as .obj.txt ...
                         textLines.forEach {
                             line -> bufferedWriter.appendLine(line)
                         }

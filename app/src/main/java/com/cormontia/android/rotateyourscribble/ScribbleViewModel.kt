@@ -116,13 +116,24 @@ class ScribbleViewModel : ViewModel() {
         if (threeDimensionalModel.any()) {
             val nrOfLines = threeDimensionalModel.size
             val pointsPerLine = threeDimensionalModel[0].size
-            for (i in 0 until pointsPerLine) {
-                val idx0 = (i + 0) + 1    // +1 because vertex indices in WaveFront.OBJ files are 1-based.
-                val idx1 = (i + 1) + 1
-                val idx2 = ((i + pointsPerLine) % nrOfLines) + 1
-                val idx3 = ((i + 1 + pointsPerLine) % nrOfLines) + 1  // Is that correct or will it go out of bounds...
-                val faceText = "f ${idx0} ${idx1} ${idx3} ${idx2}"  // Faces may consist of more than 3 vertices!
-                wavefront.add(faceText)
+            val totalNrOfPoints = nrOfLines * pointsPerLine
+            for (line in 0 until nrOfLines) {
+                val base = line * pointsPerLine
+
+                for (i in 0 until pointsPerLine) {
+                    var idx0 = (i + 0)
+                    var idx1 = (i + 1)
+                    var idx2 = (i + 0 + pointsPerLine)
+                    var idx3 = (i + 1 + pointsPerLine)
+
+                    idx0 = (idx0 + base) % totalNrOfPoints
+                    idx1 = (idx1 + base) % totalNrOfPoints
+                    idx2 = (idx2 + base) % totalNrOfPoints
+                    idx3 = (idx3 + base) % totalNrOfPoints
+
+                    val faceText = "f ${idx0+1} ${idx1+1} ${idx3+1} ${idx2+1}" // +1 because vertices are 1-based in Wavefront.OBJ // Faces may consist of more than 3 vertices!
+                    wavefront.add(faceText)
+                }
             }
         }
 
