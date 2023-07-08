@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Gebruiker/AndroidStudioProjects/RotateYourScribble/app/src/main/res/layout-land/activity_main.xml" value="0.26940035273368607" />
         <entry key="..\:/Users/Gebruiker/AndroidStudioProjects/RotateYourScribble/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/Gebruiker/AndroidStudioProjects/RotateYourScribble/app/src/main/res/layout/activity_main2.xml" value="0.28125" />
         <entry key="..\:/Users/Gebruiker/AndroidStudioProjects/RotateYourScribble/app/src/main/res/layout/flat_scribble_view.xml" value="0.1" />
         <entry key="..\:/Users/Gebruiker/AndroidStudioProjects/RotateYourScribble/app/src/main/res/layout/rotated_scribble_view.xml" value="0.1" />
         <entry key="..\:/Users/Gebruiker/AndroidStudioProjects/RotateYourScribble/app/src/main/res/layout/sample_flat_scribble_view.xml" value="0.2210144927536232" />
@@ -11,7 +12,7 @@
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_17" default="true" project-jdk-name="jbr-17" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

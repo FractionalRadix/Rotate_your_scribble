@@ -1,9 +1,10 @@
 package com.cormontia.android.rotateyourscribble
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.Configuration
 import android.graphics.*
 import android.util.AttributeSet
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 
@@ -18,13 +19,22 @@ class FlatScribbleView : View {
      */
     private val localPointsStore = mutableListOf<PointF>()
 
-    var centerX = 0.0 // Placeholder value, since primitive values do not support "lateinit".
-    var centerY = 0.0 // Placeholder value, since primitive values do not support "lateinit".
+    /**
+     * If the View is rendered for the first time, a few calculations must be done.
+     * We use this flag to check if these calculations need to be done, or have been done already.
+     */
+    private var firstTime = true
 
-    private val blackPaint = Paint()
+    /**
+     * Cache the calculated data about the view.
+     */
+    private lateinit var viewInfo: ViewInfo
+
+    private val blackLinePaint = Paint()
+
     init {
-        blackPaint.color = Color.BLACK
-        blackPaint.style = Paint.Style.FILL_AND_STROKE
+        blackLinePaint.style = Paint.Style.STROKE
+        blackLinePaint.color = Color.BLACK
     }
 
     constructor(context: Context) : super(context) {
@@ -66,28 +76,24 @@ class FlatScribbleView : View {
 
         super.onDraw(canvas)
 
-        //TODO!~ Calculate these values only once and cache them.
+        if (firstTime) {
+            viewInfo = ViewInfo(width, height, paddingLeft, paddingTop, paddingRight, paddingBottom)
+            firstTime = false
+        }
 
-        val paddingLeft = paddingLeft
-        val paddingRight = paddingRight
-        val contentWidth = width - paddingLeft - paddingRight
-        centerX = (contentWidth / 2).toDouble()
-
-        val paddingTop = paddingTop
-        val paddingBottom = paddingBottom
-        val contentHeight = height - paddingTop - paddingBottom
-        centerY = (contentHeight / 2).toDouble()
+        canvas.drawRect(viewInfo.rect, blackLinePaint)
 
         if (localPointsStore.any()) {
             var prevPoint = localPointsStore[0]
             for (pointIdx in 1 until localPointsStore.size) {
                 val curPoint = localPointsStore[pointIdx]
-                canvas.drawLine(prevPoint.x, prevPoint.y, curPoint.x, curPoint.y, blackPaint)
+                canvas.drawLine(prevPoint.x, prevPoint.y, curPoint.x, curPoint.y, blackLinePaint)
                 prevPoint = curPoint
             }
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(evt: MotionEvent): Boolean {
         // For the moment, we simply assume a single pointer.
         // In later versions, we can work with multiple pointers... and with Android's peculiar way of indexing them.
@@ -97,9 +103,15 @@ class FlatScribbleView : View {
             points.add(PointF(evt.getHistoricalX(idx), evt.getHistoricalY(idx)))
         }
         points.add(PointF(evt.x, evt.y))
-        sendPointsToContext(points, centerX, centerY)
+        sendPointsToContext(points, viewInfo.centerX, viewInfo.centerY)
 
         return true
+    }
+
+    //TODO?~ Use an orientation change listener instead of the (apparently more generic) configuration change listener?
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        firstTime = true
     }
 
     fun setPoints(points: MutableList<PointF>) {

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.PointF
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.ImageButton
 import androidx.activity.viewModels
 import java.io.*
@@ -31,7 +32,6 @@ class MainActivity : AppCompatActivity() {
                 // This happens because these values are calculated in the onDraw() method of FlatScribbleView, which is not yet called at that point.
 
                 rotatedScribbleView.setCenter(viewModel.centerX, viewModel.centerY)
-
                 rotatedScribbleView.set3DModel(viewModel.threeDimensionalModel)
             }
         }

@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PointF
 import android.util.AttributeSet
+import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -26,13 +27,31 @@ class RotatedScribbleView : View {
     private var rotatedLines = listOf<List<PointF>>()
 
     //TODO?~ These aren't always initialized in time....
+    //TODO?~ Replace with these two values with a single Point or PointF ?
+    //Note that these values are the center of the SCRIBBLE, not the center of the View!
+    // (In other words, these are world coordinates, rather than view coordinates).
     private var centerY = 0.0 // Placeholder value, since lateinit is not allowed on primitive types.
     private var centerX = 0.0 // Placeholder value, since lateinit is not allowed on primitive types.
+    fun setCenter(centerX: Double, centerY: Double) {
+        this.centerX = centerX
+        this.centerY = centerY
+    }
 
-    private val blackPaint = Paint()
+    /**
+     * If the View is rendered for the first time, a few calculations must be done.
+     * We use this flag to check if these calculations need to be done, or have been done already.
+     */
+    private var firstTime = true
+
+    /**
+     * Cache the calculated data about the view.
+     */
+    private var viewInfo: ViewInfo? = null
+
+    private val blackLinePaint = Paint()
     init {
-        blackPaint.color = Color.BLACK
-        blackPaint.style = Paint.Style.FILL_AND_STROKE
+        blackLinePaint.color = Color.BLACK
+        blackLinePaint.style = Paint.Style.STROKE
     }
 
     private lateinit var mGestureDetector: GestureDetectorCompat
@@ -72,7 +91,8 @@ class RotatedScribbleView : View {
 
         leftwardAnimator.addUpdateListener {
             yRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
-            rotatedLines = rotate3DModel(frame3D, 0.0, yRotation.toDouble())
+            //TODO?~ Find the right value for centerX/centerY early on...? Is that even possible?
+            rotatedLines = rotate3DModel(0.0, 0.0, frame3D, 0.0, yRotation.toDouble())
             invalidate()
         }
         leftwardAnimator.interpolator = DecelerateInterpolator()
@@ -80,7 +100,7 @@ class RotatedScribbleView : View {
 
         rightwardAnimator.addUpdateListener {
             yRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
-            rotatedLines = rotate3DModel(frame3D,0.0, yRotation.toDouble())
+            rotatedLines = rotate3DModel(centerX, centerY, frame3D,0.0, yRotation.toDouble())
             invalidate()
         }
         rightwardAnimator.interpolator = DecelerateInterpolator()
@@ -88,7 +108,7 @@ class RotatedScribbleView : View {
 
         upwardAnimator.addUpdateListener {
             xRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
-            rotatedLines = rotate3DModel(frame3D, xRotation.toDouble(), 0.0)
+            rotatedLines = rotate3DModel(centerX, centerY, frame3D, xRotation.toDouble(), 0.0)
             invalidate()
         }
         upwardAnimator.interpolator = DecelerateInterpolator()
@@ -96,7 +116,7 @@ class RotatedScribbleView : View {
 
         downwardAnimator.addUpdateListener {
             xRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
-            rotatedLines = rotate3DModel(frame3D, xRotation.toDouble(), 0.0)
+            rotatedLines = rotate3DModel(centerX, centerY, frame3D, xRotation.toDouble(), 0.0)
             invalidate()
         }
         downwardAnimator.interpolator = DecelerateInterpolator()
@@ -106,6 +126,13 @@ class RotatedScribbleView : View {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
+        if (firstTime) {
+            viewInfo = ViewInfo(width, height, paddingLeft, paddingTop, paddingRight, paddingBottom)
+            firstTime = false
+        }
+
+        canvas.drawRect(viewInfo!!.rect, blackLinePaint)
 
         for (line in rotatedLines) {
             drawPointList(canvas, line)
@@ -117,27 +144,22 @@ class RotatedScribbleView : View {
             var prevPoint = pointList[0]
             for (pointIdx in 1 until pointList.size) {
                 val curPoint = pointList[pointIdx]
-                canvas.drawLine(prevPoint.x, prevPoint.y, curPoint.x, curPoint.y, blackPaint)
+                canvas.drawLine(prevPoint.x, prevPoint.y, curPoint.x, curPoint.y, blackLinePaint)
                 prevPoint = curPoint
             }
         }
     }
 
-    fun setCenter(centerX: Double, centerY: Double) {
-        this.centerX = centerX
-        this.centerY = centerY
-    }
-
     fun set3DModel(model: List<List<Vec4>>) {
         frame3D = model
-        rotatedLines = rotate3DModel(frame3D, 0.0, 0.0)
+        rotatedLines = rotate3DModel(centerX, centerY, frame3D, 0.0, 0.0)
         invalidate()
     }
 
     /**
      * Rotate a 3D model around the x-axis and the y-axis.
      */
-    private fun rotate3DModel(lines: List<List<Vec4>>, xRotation: Double, yRotation: Double): List<List<PointF>> {
+    private fun rotate3DModel(centerX: Double, centerY: Double, lines: List<List<Vec4>>, xRotation: Double, yRotation: Double): List<List<PointF>> {
         val translateBefore = MatrixFactory.Translate(-centerX, -centerY, 0.0)
         val translateAfter = MatrixFactory.Translate(+centerX, +centerY, 0.0)
         val animationRotationX = MatrixFactory.RotateAroundX(xRotation)

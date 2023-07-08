@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/buttonPanel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+        <ImageButton
+            android:id="@+id/clearButton"
+            android:src="@drawable/ic_baseline_clear_24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <ImageButton
+            android:id="@+id/loadButton"
+            android:src="@drawable/ic_baseline_open_in_new_24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <ImageButton
+            android:id="@+id/saveButton"
+            android:src="@drawable/ic_baseline_save_24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <ImageButton
+            android:id="@+id/exportButton"
+            android:src="@drawable/ic_baseline_import_export_24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+        <ImageButton
+            android:id="@+id/shareButton"
+            android:src="@drawable/ic_baseline_share_24"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+    </LinearLayout>
+
+    <!-- Height should only be "match_parent" is parent does not include the button bar... -->
+    <com.cormontia.android.rotateyourscribble.FlatScribbleView
+        android:id="@+id/flatScribbleView"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toBottomOf="@id/buttonPanel"
+        app:layout_constraintEnd_toStartOf="@id/rotatedScribbleview"
+        app:layout_constraintStart_toStartOf="parent">
+    </com.cormontia.android.rotateyourscribble.FlatScribbleView>
+
+    <!-- Height should only be "match_parent" is parent does not include the button bar... -->
+    <com.cormontia.android.rotateyourscribble.RotatedScribbleView
+        android:id="@+id/rotatedScribbleview"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/flatScribbleView"
+        app:layout_constraintTop_toBottomOf="@id/buttonPanel">
+    </com.cormontia.android.rotateyourscribble.RotatedScribbleView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
