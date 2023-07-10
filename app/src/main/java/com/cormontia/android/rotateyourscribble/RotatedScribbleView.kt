@@ -1,6 +1,7 @@
 package com.cormontia.android.rotateyourscribble
 
 import android.animation.ValueAnimator
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -181,9 +182,10 @@ class RotatedScribbleView : View {
 
     // Gesture detection
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-        mGestureDetector.onTouchEvent(event)
-        if (event != null) {
+        if (event != null) { //TODO?- The situation that event==null shouldn't occur.
+            mGestureDetector.onTouchEvent(event)
             if (event.actionMasked == MotionEvent.ACTION_DOWN) {
                 return true
             }
@@ -201,26 +203,24 @@ class RotatedScribbleView : View {
         }
 
         override fun onFling(
-            e1: MotionEvent?,
-            e2: MotionEvent?,
+            e1: MotionEvent,
+            e2: MotionEvent,
             velocityX: Float,
-            velocityY: Float
+            velocityY: Float,
         ): Boolean {
-            if (e1 != null && e2 != null) {
-                val rightward = e2.x - e1.x
-                val upward = e2.y - e1.y
-                if (abs(rightward) > abs(upward)) {
-                    if (rightward > 0) {
-                        rightwardAnimator.start()
-                    } else {
-                        leftwardAnimator.start()
-                    }
+            val rightward = e2.x - e1.x
+            val upward = e2.y - e1.y
+            if (abs(rightward) > abs(upward)) {
+                if (rightward > 0) {
+                    rightwardAnimator.start()
                 } else {
-                    if (upward > 0) {
-                        upwardAnimator.start()
-                    } else {
-                        downwardAnimator.start()
-                    }
+                    leftwardAnimator.start()
+                }
+            } else {
+                if (upward > 0) {
+                    upwardAnimator.start()
+                } else {
+                    downwardAnimator.start()
                 }
             }
             return super.onFling(e1, e2, velocityX, velocityY)

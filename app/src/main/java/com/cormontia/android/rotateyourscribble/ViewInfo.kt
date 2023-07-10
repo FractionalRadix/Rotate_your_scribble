@@ -24,13 +24,9 @@ class ViewInfo(
         private set;
 
     init {
-        val paddingLeft = paddingLeft
-        val paddingRight = paddingRight
         val contentWidth = width - paddingLeft - paddingRight
         centerX = (contentWidth / 2).toDouble()
 
-        val paddingTop = paddingTop
-        val paddingBottom = paddingBottom
         val contentHeight = height - paddingTop - paddingBottom
         centerY = (contentHeight / 2).toDouble()
 

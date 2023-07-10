@@ -48,7 +48,7 @@
             />
     </LinearLayout>
 
-    <!-- Height should only be "match_parent" is parent does not include the button bar... -->
+    <!-- Height should only be "match_parent" when parent does not include the button bar... -->
     <com.cormontia.android.rotateyourscribble.FlatScribbleView
         android:id="@+id/flatScribbleView"
         android:layout_width="300dp"
@@ -58,7 +58,7 @@
         app:layout_constraintStart_toStartOf="parent">
     </com.cormontia.android.rotateyourscribble.FlatScribbleView>
 
-    <!-- Height should only be "match_parent" is parent does not include the button bar... -->
+    <!-- Height should only be "match_parent" when parent does not include the button bar... -->
     <com.cormontia.android.rotateyourscribble.RotatedScribbleView
         android:id="@+id/rotatedScribbleview"
         android:layout_width="300dp"
