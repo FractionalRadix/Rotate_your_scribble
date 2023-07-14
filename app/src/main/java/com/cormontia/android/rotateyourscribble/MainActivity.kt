@@ -6,10 +6,7 @@ import android.graphics.PointF
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.ImageButton
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.viewModels
 import java.io.*
@@ -19,75 +16,60 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: ScribbleViewModel by viewModels()
 
-    private val storageFileMimeType = "text/plain"
+    //TODO?~ Move to some location for static data...
+    val storageFileMimeType = "text/plain"
 
-    private val loadLauncher = registerForActivityResult(
-        //TODO?~ See if we can have a launcher that does NOT require input (0 parameters instead of a dummy String parameter).
-        object: ActivityResultContract<String, Uri>() {
-            override fun createIntent(context: Context, input: String?): Intent {
-                val loadIntent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-                loadIntent.addCategory(Intent.CATEGORY_OPENABLE)
-                loadIntent.type = storageFileMimeType
-                return loadIntent
-            }
+    private val loadLauncher = registerForActivityResult(LoaderContract()) { uri -> load(uri) }
+    private val saveLauncher = registerForActivityResult(SaverContract()) { uri -> save(uri) }
+    private val exportLauncher = registerForActivityResult(ExporterContract()) { uri -> export(uri) }
 
-            override fun parseResult(resultCode: Int, intent: Intent?): Uri {
-                return intent?.data!! //TODO!+ Some NULL handling...
-            }
-        },
-        object: ActivityResultCallback<Uri> {
-            override fun onActivityResult(result: Uri?) {
-                load(result)
-            }
+    //TODO?~ See if we can have a launcher that does NOT require input (0 parameters instead of a dummy String parameter).
+    class LoaderContract: ActivityResultContract<String, Uri>() {
+        override fun createIntent(context: Context, input: String?): Intent {
+            val loadIntent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            loadIntent.addCategory(Intent.CATEGORY_OPENABLE)
+            loadIntent.type = "text/plain" //TODO!~ See if we can obtain this from the owning class.
+            return loadIntent
         }
-    )
 
-    private val saveLauncher = registerForActivityResult(
-        //TODO?~ See if we can have a launcher that does NOT require input (0 parameters instead of a dummy String parameter).
-        object: ActivityResultContract<String, Uri>() {
-            override fun createIntent(context: Context, input: String?): Intent {
-                // "Note: ACTION_CREATE_DOCUMENT cannot overwrite an existing file.
-                //  If your app tries to save a file with the same name, the system appends a number in parentheses at the end of the file name."
-                // Source: https://developer.android.com/training/data-storage/shared/documents-files#create-file
-                val saveIntent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-                saveIntent.type = storageFileMimeType
-                saveIntent.putExtra(Intent.EXTRA_TITLE, "scribble.txt") //TODO?~ Add timestamp or something to make it unique?
-                return saveIntent
-            }
-
-            override fun parseResult(resultCode: Int, intent: Intent?): Uri {
-                return intent?.data!! //TODO!+ Some NULL handling...
-            }
-        },
-        object: ActivityResultCallback<Uri> {
-            override fun onActivityResult(result: Uri?) {
-                save(result)
-            }
+        override fun parseResult(resultCode: Int, intent: Intent?): Uri {
+            return intent?.data!! //TODO!+ Some NULL handling...
         }
-    )
+    }
 
-    private val exportLauncher = registerForActivityResult(
-        object: ActivityResultContract<String, Uri>() {
-            override fun createIntent(context: Context, input: String?): Intent {
-                // "Note: ACTION_CREATE_DOCUMENT cannot overwrite an existing file.
-                //  If your app tries to save a file with the same name, the system appends a number in parentheses at the end of the file name."
-                // Source: https://developer.android.com/training/data-storage/shared/documents-files#create-file
-                val exportIntent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-                exportIntent.type = storageFileMimeType
-                exportIntent.putExtra(Intent.EXTRA_TITLE, "scribble.obj") //TODO?~ Add timestamp or something to make it unique?
-                return exportIntent
-            }
-
-            override fun parseResult(resultCode: Int, intent: Intent?): Uri {
-                return intent?.data!! //TODO!+ Some NULL handling...
-            }
-        },
-        object: ActivityResultCallback<Uri> {
-            override fun onActivityResult(result: Uri?) {
-                export(result)
-            }
+    //TODO?~ See if we can have a launcher that does NOT require input (0 parameters instead of a dummy String parameter).
+    class SaverContract: ActivityResultContract<String, Uri>() {
+        override fun createIntent(context: Context, input: String?): Intent {
+            // "Note: ACTION_CREATE_DOCUMENT cannot overwrite an existing file.
+            //  If your app tries to save a file with the same name, the system appends a number in parentheses at the end of the file name."
+            // Source: https://developer.android.com/training/data-storage/shared/documents-files#create-file
+            val saveIntent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+            saveIntent.type = "text/plain" //TODO!~ See if we can obtain this from the owning class.
+            saveIntent.putExtra(Intent.EXTRA_TITLE, "scribble.txt") //TODO?~ Add timestamp or something to make it unique?
+            return saveIntent
         }
-    )
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Uri {
+            return intent?.data!! //TODO!+ Some NULL handling...
+        }
+    }
+
+    //TODO?~ See if we can have a launcher that does NOT require input (0 parameters instead of a dummy String parameter).
+    class ExporterContract : ActivityResultContract<String, Uri>() {
+        override fun createIntent(context: Context, input: String?): Intent {
+            // "Note: ACTION_CREATE_DOCUMENT cannot overwrite an existing file.
+            //  If your app tries to save a file with the same name, the system appends a number in parentheses at the end of the file name."
+            // Source: https://developer.android.com/training/data-storage/shared/documents-files#create-file
+            val exportIntent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+            exportIntent.type = "text/plain" //TODO!~ See if we can obtain this from the owning class.
+            exportIntent.putExtra(Intent.EXTRA_TITLE, "scribble.obj") //TODO?~ Add timestamp or something to make it unique?
+            return exportIntent
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Uri {
+            return intent?.data!! //TODO!+ Some NULL handling...
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
