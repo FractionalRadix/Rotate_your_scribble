@@ -8,7 +8,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PointF
 import android.util.AttributeSet
-import android.util.Log
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -28,10 +27,10 @@ class RotatedScribbleView : View {
     private var rotatedLines = listOf<List<PointF>>()
 
     //TODO?~ These aren't always initialized in time....
-    //TODO?~ Replace with these two values with a single Point or PointF ?
     //Note that these values are the center of the SCRIBBLE, not the center of the View!
     // (In other words, these are world coordinates, rather than view coordinates).
     private var center = PointF(0.0f,0.0f)    // Placeholder value. TODO?~ Use lateinit?
+
     fun setCenter(center: PointF) {
         this.center = center
     }

@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.PointF
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.ImageButton
 import androidx.activity.viewModels
 import java.io.*
@@ -31,7 +30,7 @@ class MainActivity : AppCompatActivity() {
                 // Also, it seems that (centerX, centerY)==(0.0, 0.0) when the first thing you do is load a model.
                 // This happens because these values are calculated in the onDraw() method of FlatScribbleView, which is not yet called at that point.
 
-                rotatedScribbleView.setCenter(PointF(viewModel.centerX.toFloat(), viewModel.centerY.toFloat()))
+                rotatedScribbleView.setCenter(viewModel.center)
                 rotatedScribbleView.set3DModel(viewModel.threeDimensionalModel)
             }
         }
@@ -47,8 +46,8 @@ class MainActivity : AppCompatActivity() {
         viewModel.accept(points)
     }
 
-    fun setCenter(centerX: Double, centerY: Double) {
-        viewModel.setCenter(centerX, centerY)
+    fun setCenter(center: PointF) {
+        viewModel.setCenter(center)
     }
 
     private fun clear() {
@@ -87,13 +86,13 @@ class MainActivity : AppCompatActivity() {
 
     private val shareCode = 35
     private fun share() {
-        val sharingIntent = Intent(android.content.Intent.ACTION_SEND)
+        val sharingIntent = Intent(Intent.ACTION_SEND)
         sharingIntent.type = "text/plain"   // That apparently really IS the MIME Type for Wavefront.OBJ ....
         val textLines = viewModel
             .toWavefrontFormat()
             .joinToString( separator = "\r\n" )
         //TODO?~ The amount of data in even a simple scribble, causes the thing to crash... looks like a timeout.
-        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, textLines)
+        sharingIntent.putExtra(Intent.EXTRA_TEXT, textLines)
         startActivity(Intent.createChooser(sharingIntent, "Share using: "))
     }
 

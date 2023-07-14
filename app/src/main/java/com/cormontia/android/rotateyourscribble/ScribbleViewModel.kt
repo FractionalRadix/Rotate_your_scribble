@@ -19,10 +19,7 @@ class ScribbleViewModel : ViewModel() {
     //TODO?~ Should this be LiveData too?
     var threeDimensionalModel = listOf<List<Vec4>>()
 
-    var centerX = 0.0 // Placeholder value, since primitive types cannot use "lateinit".
-        private set
-
-    var centerY = 0.0 // Placeholder value, since primitive types cannot use "lateinit".
+    var center = PointF(0.0f, 0.0f) // Placeholder value. TODO?+ Use "lateinit" ?
         private set
 
     //TODO?~ use List<PointF> as parameter, instead of MutableList<PointF> ?
@@ -32,9 +29,8 @@ class ScribbleViewModel : ViewModel() {
         points.value = points_backingField
     }
 
-    fun setCenter(centerX: Double, centerY: Double) {
-        this.centerX = centerX
-        this.centerY = centerY
+    fun setCenter(center: PointF) {
+        this.center = center
     }
 
     fun clear() {
@@ -75,8 +71,8 @@ class ScribbleViewModel : ViewModel() {
         val rotatedLines = mutableListOf<MutableList<Vec4>>()
 
         //TODO!~ Make these two center values independent, because this method is going to be moved to the ViewModel!
-        val translateBefore = MatrixFactory.Translate(-centerX, -centerY, 0.0)
-        val translateAfter = MatrixFactory.Translate(+centerX, +centerY, 0.0)
+        val translateBefore = MatrixFactory.Translate(-center.x.toDouble(), -center.y.toDouble(), 0.0)
+        val translateAfter = MatrixFactory.Translate(+center.x.toDouble(), +center.y.toDouble(), 0.0)
 
         for (angleInDegrees in 0 until 360 step 5) {
             val angleInRadians = Math.toRadians(angleInDegrees.toDouble())

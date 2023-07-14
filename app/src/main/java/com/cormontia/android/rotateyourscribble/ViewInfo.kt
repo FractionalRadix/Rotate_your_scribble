@@ -1,5 +1,6 @@
 package com.cormontia.android.rotateyourscribble
 
+import android.graphics.PointF
 import android.graphics.Rect
 
 /**
@@ -16,19 +17,18 @@ class ViewInfo(
     paddingBottom: Int,
 ) {
     var rect: Rect
-        private set;
-    //TODO?~ Replace these two with PointF
-    var centerX: Double
-        private set;
-    var centerY: Double
-        private set;
+        private set
+    var center: PointF
+        private set
 
     init {
         val contentWidth = width - paddingLeft - paddingRight
-        centerX = (contentWidth / 2).toDouble()
+        val centerX = (contentWidth / 2).toFloat()
 
         val contentHeight = height - paddingTop - paddingBottom
-        centerY = (contentHeight / 2).toDouble()
+        val centerY = (contentHeight / 2).toFloat()
+
+        center = PointF(centerX, centerY)
 
         val left = paddingLeft
         val top = paddingTop
