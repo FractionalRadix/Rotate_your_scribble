@@ -92,8 +92,7 @@ class RotatedScribbleView : View {
 
         leftwardAnimator.addUpdateListener {
             yRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
-            //TODO?~ Find the right value for centerX/centerY early on...? Is that even possible?
-            rotatedLines = rotate3DModel(0.0, 0.0, frame3D, 0.0, yRotation.toDouble())
+            rotatedLines = rotate3DModel(centerX, centerY, frame3D, 0.0, yRotation.toDouble())
             invalidate()
         }
         leftwardAnimator.interpolator = DecelerateInterpolator()
