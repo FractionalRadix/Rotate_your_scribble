@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
                 // Also, it seems that (centerX, centerY)==(0.0, 0.0) when the first thing you do is load a model.
                 // This happens because these values are calculated in the onDraw() method of FlatScribbleView, which is not yet called at that point.
 
-                rotatedScribbleView.setCenter(viewModel.centerX, viewModel.centerY)
+                rotatedScribbleView.setCenter(PointF(viewModel.centerX.toFloat(), viewModel.centerY.toFloat()))
                 rotatedScribbleView.set3DModel(viewModel.threeDimensionalModel)
             }
         }

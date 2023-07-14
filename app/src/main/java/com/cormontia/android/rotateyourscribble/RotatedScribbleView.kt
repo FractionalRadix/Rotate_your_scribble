@@ -31,11 +31,9 @@ class RotatedScribbleView : View {
     //TODO?~ Replace with these two values with a single Point or PointF ?
     //Note that these values are the center of the SCRIBBLE, not the center of the View!
     // (In other words, these are world coordinates, rather than view coordinates).
-    private var centerY = 0.0 // Placeholder value, since lateinit is not allowed on primitive types.
-    private var centerX = 0.0 // Placeholder value, since lateinit is not allowed on primitive types.
-    fun setCenter(centerX: Double, centerY: Double) {
-        this.centerX = centerX
-        this.centerY = centerY
+    private var center = PointF(0.0f,0.0f)    // Placeholder value. TODO?~ Use lateinit?
+    fun setCenter(center: PointF) {
+        this.center = center
     }
 
     /**
@@ -92,7 +90,7 @@ class RotatedScribbleView : View {
 
         leftwardAnimator.addUpdateListener {
             yRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
-            rotatedLines = rotate3DModel(centerX, centerY, frame3D, 0.0, yRotation.toDouble())
+            rotatedLines = rotate3DModel(center, frame3D, 0.0, yRotation.toDouble())
             invalidate()
         }
         leftwardAnimator.interpolator = DecelerateInterpolator()
@@ -100,7 +98,7 @@ class RotatedScribbleView : View {
 
         rightwardAnimator.addUpdateListener {
             yRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
-            rotatedLines = rotate3DModel(centerX, centerY, frame3D,0.0, yRotation.toDouble())
+            rotatedLines = rotate3DModel(center, frame3D,0.0, yRotation.toDouble())
             invalidate()
         }
         rightwardAnimator.interpolator = DecelerateInterpolator()
@@ -108,7 +106,7 @@ class RotatedScribbleView : View {
 
         upwardAnimator.addUpdateListener {
             xRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
-            rotatedLines = rotate3DModel(centerX, centerY, frame3D, xRotation.toDouble(), 0.0)
+            rotatedLines = rotate3DModel(center, frame3D, xRotation.toDouble(), 0.0)
             invalidate()
         }
         upwardAnimator.interpolator = DecelerateInterpolator()
@@ -116,7 +114,7 @@ class RotatedScribbleView : View {
 
         downwardAnimator.addUpdateListener {
             xRotation = it.animatedValue as Float //TODO?~ Use it.animatedFraction instead?
-            rotatedLines = rotate3DModel(centerX, centerY, frame3D, xRotation.toDouble(), 0.0)
+            rotatedLines = rotate3DModel(center, frame3D, xRotation.toDouble(), 0.0)
             invalidate()
         }
         downwardAnimator.interpolator = DecelerateInterpolator()
@@ -152,16 +150,16 @@ class RotatedScribbleView : View {
 
     fun set3DModel(model: List<List<Vec4>>) {
         frame3D = model
-        rotatedLines = rotate3DModel(centerX, centerY, frame3D, 0.0, 0.0)
+        rotatedLines = rotate3DModel(center, frame3D, 0.0, 0.0)
         invalidate()
     }
 
     /**
      * Rotate a 3D model around the x-axis and the y-axis.
      */
-    private fun rotate3DModel(centerX: Double, centerY: Double, lines: List<List<Vec4>>, xRotation: Double, yRotation: Double): List<List<PointF>> {
-        val translateBefore = MatrixFactory.Translate(-centerX, -centerY, 0.0)
-        val translateAfter = MatrixFactory.Translate(+centerX, +centerY, 0.0)
+    private fun rotate3DModel(center: PointF, lines: List<List<Vec4>>, xRotation: Double, yRotation: Double): List<List<PointF>> {
+        val translateBefore = MatrixFactory.Translate(-center.x.toDouble(), -center.y.toDouble(), 0.0)
+        val translateAfter = MatrixFactory.Translate(+center.x.toDouble(), +center.y.toDouble(), 0.0)
         val animationRotationX = MatrixFactory.RotateAroundX(xRotation)
         val animationRotationY = MatrixFactory.RotateAroundY(yRotation)
         val fullMatrix = translateAfter * animationRotationX * animationRotationY * translateBefore
