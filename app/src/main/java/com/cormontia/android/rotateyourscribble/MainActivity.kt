@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     //TODO?~ See if we can have a launcher that does NOT require input (0 parameters instead of a dummy String parameter).
     //TODO?~ Use the default GetContent or OpenDocument contract?
-    class LoaderContract: ActivityResultContract<String, Uri>() {
+    class LoaderContract: ActivityResultContract<String, Uri?>() {
         override fun createIntent(context: Context, input: String?): Intent {
             val loadIntent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             loadIntent.addCategory(Intent.CATEGORY_OPENABLE)
@@ -34,14 +34,14 @@ class MainActivity : AppCompatActivity() {
             return loadIntent
         }
 
-        override fun parseResult(resultCode: Int, intent: Intent?): Uri {
-            return intent?.data!! //TODO!+ Some NULL handling...
+        override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+            return intent?.data
         }
     }
 
     //TODO?~ See if we can have a launcher that does NOT require input (0 parameters instead of a dummy String parameter).
     //TODO?~ Use the CreateDocument contract?
-    class SaverContract: ActivityResultContract<String, Uri>() {
+    class SaverContract: ActivityResultContract<String, Uri?>() {
         override fun createIntent(context: Context, input: String?): Intent {
             // "Note: ACTION_CREATE_DOCUMENT cannot overwrite an existing file.
             //  If your app tries to save a file with the same name, the system appends a number in parentheses at the end of the file name."
@@ -52,13 +52,13 @@ class MainActivity : AppCompatActivity() {
             return saveIntent
         }
 
-        override fun parseResult(resultCode: Int, intent: Intent?): Uri {
-            return intent?.data!! //TODO!+ Some NULL handling...
+        override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+            return intent?.data
         }
     }
 
     //TODO?~ See if we can have a launcher that does NOT require input (0 parameters instead of a dummy String parameter).
-    class ExporterContract : ActivityResultContract<String, Uri>() {
+    class ExporterContract : ActivityResultContract<String, Uri?>() {
         override fun createIntent(context: Context, input: String?): Intent {
             // "Note: ACTION_CREATE_DOCUMENT cannot overwrite an existing file.
             //  If your app tries to save a file with the same name, the system appends a number in parentheses at the end of the file name."
@@ -69,8 +69,8 @@ class MainActivity : AppCompatActivity() {
             return exportIntent
         }
 
-        override fun parseResult(resultCode: Int, intent: Intent?): Uri {
-            return intent?.data!! //TODO!+ Some NULL handling...
+        override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+            return intent?.data
         }
     }
 
@@ -127,7 +127,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun load(uri: Uri?) {
         if (uri != null) {
-            //TODO!+ Handle FileNotFoundException and IOException
+            //TODO!+ Handle FileNotFoundException and IOException.
+            //TODO!+ Handle parsing errors.
             val contentResolver = applicationContext.contentResolver
             val parcelFileDescriptor = contentResolver.openFileDescriptor(uri, "r")
             val fileReader = FileReader(parcelFileDescriptor?.fileDescriptor)
@@ -143,7 +144,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun save(uri: Uri?) {
         if (uri != null) {
-            //TODO!+ Handle FileNotFoundException and IOException
+            //TODO!+ Handle FileNotFoundException and IOException.
             val contentResolver = applicationContext.contentResolver
             val parcelFileDescriptor = contentResolver.openFileDescriptor(uri, "w")
             val fileWriter = FileWriter(parcelFileDescriptor?.fileDescriptor)
