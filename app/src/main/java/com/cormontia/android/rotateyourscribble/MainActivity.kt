@@ -14,21 +14,23 @@ import kotlin.streams.toList
 
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel: ScribbleViewModel by viewModels()
+    companion object {
+        val storageFileMimeType = "text/plain"
+    }
 
-    //TODO?~ Move to some location for static data...
-    val storageFileMimeType = "text/plain"
+    private val viewModel: ScribbleViewModel by viewModels()
 
     private val loadLauncher = registerForActivityResult(LoaderContract()) { uri -> load(uri) }
     private val saveLauncher = registerForActivityResult(SaverContract()) { uri -> save(uri) }
     private val exportLauncher = registerForActivityResult(ExporterContract()) { uri -> export(uri) }
 
     //TODO?~ See if we can have a launcher that does NOT require input (0 parameters instead of a dummy String parameter).
+    //TODO?~ Use the default GetContent or OpenDocument contract?
     class LoaderContract: ActivityResultContract<String, Uri>() {
         override fun createIntent(context: Context, input: String?): Intent {
             val loadIntent = Intent(Intent.ACTION_OPEN_DOCUMENT)
             loadIntent.addCategory(Intent.CATEGORY_OPENABLE)
-            loadIntent.type = "text/plain" //TODO!~ See if we can obtain this from the owning class.
+            loadIntent.type = storageFileMimeType
             return loadIntent
         }
 
@@ -38,13 +40,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     //TODO?~ See if we can have a launcher that does NOT require input (0 parameters instead of a dummy String parameter).
+    //TODO?~ Use the CreateDocument contract?
     class SaverContract: ActivityResultContract<String, Uri>() {
         override fun createIntent(context: Context, input: String?): Intent {
             // "Note: ACTION_CREATE_DOCUMENT cannot overwrite an existing file.
             //  If your app tries to save a file with the same name, the system appends a number in parentheses at the end of the file name."
             // Source: https://developer.android.com/training/data-storage/shared/documents-files#create-file
             val saveIntent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-            saveIntent.type = "text/plain" //TODO!~ See if we can obtain this from the owning class.
+            saveIntent.type = storageFileMimeType
             saveIntent.putExtra(Intent.EXTRA_TITLE, "scribble.txt") //TODO?~ Add timestamp or something to make it unique?
             return saveIntent
         }
@@ -61,7 +64,7 @@ class MainActivity : AppCompatActivity() {
             //  If your app tries to save a file with the same name, the system appends a number in parentheses at the end of the file name."
             // Source: https://developer.android.com/training/data-storage/shared/documents-files#create-file
             val exportIntent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-            exportIntent.type = "text/plain" //TODO!~ See if we can obtain this from the owning class.
+            exportIntent.type = storageFileMimeType
             exportIntent.putExtra(Intent.EXTRA_TITLE, "scribble.obj") //TODO?~ Add timestamp or something to make it unique?
             return exportIntent
         }
