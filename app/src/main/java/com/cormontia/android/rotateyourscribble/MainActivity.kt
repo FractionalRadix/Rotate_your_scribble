@@ -7,6 +7,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.viewModels
 import java.io.*
@@ -20,7 +21,7 @@ interface PointsReceiver {
 class MainActivity : AppCompatActivity(), PointsReceiver {
 
     companion object {
-        val storageFileMimeType = "text/plain"
+        const val storageFileMimeType = "text/plain"
     }
 
     private val viewModel: ScribbleViewModel by viewModels()
@@ -142,7 +143,13 @@ class MainActivity : AppCompatActivity(), PointsReceiver {
                 .filter { !it.isNullOrBlank() }
                 .toList()
             parcelFileDescriptor?.close()
-            val points = viewModel.deserializePointsList(stringList)
+            val parseResult = viewModel.deserializePointsList(stringList)
+            val points = parseResult.first
+            val nrOfParseErrors = parseResult.second
+            if (nrOfParseErrors > 0) {
+                val errToast = Toast.makeText(this, "Errors trying to load. File may be corrupted or not in the right format.", Toast.LENGTH_LONG)
+                errToast.show()
+            }
             viewModel.clear()
             viewModel.accept(points as MutableList<PointF>)
         }

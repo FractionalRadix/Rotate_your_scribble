@@ -1,6 +1,7 @@
 package com.cormontia.android.rotateyourscribble
 
 import android.graphics.PointF
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.cormontia.android.rotateyourscribble.matrix3d.MatrixFactory
@@ -48,20 +49,33 @@ class ScribbleViewModel : ViewModel() {
         return serialization
     }
 
-    //TODO?~ Make this static (i.e. put it in a companion object?) Note that "serialize" should NOT be static!
-    fun deserializePointsList(stringList: List<String>): List<PointF> {
+    //TODO?~ Make this static (i.e. put it in a companion object?) Note that "serialize" should NOT be static, as long as it takes the points straight from the ViewModel's data members!
+    /**
+     * Given a list of points in the format "<float> <float>", parse this into a list of points.
+     * @param stringList A list of strings, where each string contains two floating-point numbers, separated by one or more spaces.
+     * @return A list of points and an integer; the integer is the number of parsing errors encountered. If all went well, it has value 0.
+     */
+    fun deserializePointsList(stringList: List<String>): Pair<List<PointF>, Int> {
+        var linesWithErrors = 0
         val points = mutableListOf<PointF>()
         for (point in stringList) {
             val split = point.split(' ')
             if (split.size != 2) {
-                //TODO!+ Issue an error
+                linesWithErrors++
             } else {
-                val x = split[0].toFloat()
-                val y = split[1].toFloat()
-                points.add(PointF(x,y))
+                try {
+                    val x = split[0].toFloat()
+                    val y = split[1].toFloat()
+                    points.add(PointF(x, y))
+                } catch (exc: NumberFormatException) {
+                    linesWithErrors++
+                }
             }
         }
-        return points
+        if (linesWithErrors > 0) {
+            Log.e("ScribbleViewModel parser", "Encountered errors while trying to load a Scribble file. Check that the file is in the right format and is not corrupted.")
+        }
+        return Pair(points, linesWithErrors)
     }
 
     /**
