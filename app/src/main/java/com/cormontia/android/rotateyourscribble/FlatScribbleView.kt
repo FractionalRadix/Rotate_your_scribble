@@ -79,7 +79,14 @@ class FlatScribbleView : View {
         if (firstTime) {
             viewInfo = ViewInfo(width, height, paddingLeft, paddingTop, paddingRight, paddingBottom)
             firstTime = false
+
+            //TODO?~ Move?
+            if (context is MainActivity) {
+                val activity = context as MainActivity
+                activity.setCenter(viewInfo.center)
+            }
         }
+
 
         canvas.drawRect(viewInfo.rect, blackLinePaint)
 
