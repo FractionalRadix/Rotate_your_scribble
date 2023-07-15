@@ -136,6 +136,7 @@ class MainActivity : AppCompatActivity() {
                 .lines()
                 .filter { !it.isNullOrBlank() }
                 .toList()
+            parcelFileDescriptor?.close()
             val points = viewModel.deserializePointsList(stringList)
             viewModel.clear()
             viewModel.accept(points as MutableList<PointF>)
@@ -156,6 +157,8 @@ class MainActivity : AppCompatActivity() {
                     bufferedWriter.appendLine(line)
                 }
             }
+
+            parcelFileDescriptor?.close()
         }
     }
 
@@ -174,6 +177,8 @@ class MainActivity : AppCompatActivity() {
                     bufferedWriter.appendLine(line)
                 }
             }
+
+            parcelFileDescriptor?.close()
         }
     }
 }
