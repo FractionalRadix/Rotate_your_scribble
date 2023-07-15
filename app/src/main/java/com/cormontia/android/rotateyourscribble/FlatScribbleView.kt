@@ -62,13 +62,10 @@ class FlatScribbleView : View {
         a.recycle()
     }
 
-    //TODO?~ Do this more neat, by making MainActivity implement an interface that accepts points lists.
-    // Then we can simply check if "context" implements that interface, and if so, use it.
-    private fun sendPointsToContext(points: MutableList<PointF>, center: PointF) {
-        if (context is MainActivity) {
-            val activity = context as MainActivity
+    private fun sendPointsToContext(points: MutableList<PointF>) {
+        if (context is PointsReceiver) {
+            val activity = context as PointsReceiver
             activity.accept(points)
-            activity.setCenter(center) //TODO!~ Move this to a caller of its own, to make this call only once.
         }
     }
 
@@ -80,9 +77,8 @@ class FlatScribbleView : View {
             viewInfo = ViewInfo(width, height, paddingLeft, paddingTop, paddingRight, paddingBottom)
             firstTime = false
 
-            //TODO?~ Move?
-            if (context is MainActivity) {
-                val activity = context as MainActivity
+            if (context is PointsReceiver) {
+                val activity = context as PointsReceiver
                 activity.setCenter(viewInfo.center)
             }
         }
@@ -110,7 +106,7 @@ class FlatScribbleView : View {
             points.add(PointF(evt.getHistoricalX(idx), evt.getHistoricalY(idx)))
         }
         points.add(PointF(evt.x, evt.y))
-        sendPointsToContext(points, viewInfo.center)
+        sendPointsToContext(points)
 
         return true
     }

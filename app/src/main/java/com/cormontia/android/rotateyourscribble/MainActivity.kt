@@ -12,7 +12,12 @@ import androidx.activity.viewModels
 import java.io.*
 import kotlin.streams.toList
 
-class MainActivity : AppCompatActivity() {
+interface PointsReceiver {
+    fun accept(points: MutableList<PointF>)
+    fun setCenter(center: PointF)
+}
+
+class MainActivity : AppCompatActivity(), PointsReceiver {
 
     companion object {
         val storageFileMimeType = "text/plain"
@@ -101,11 +106,11 @@ class MainActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.shareButton).setOnClickListener{ share() }
     }
 
-    fun accept(points: MutableList<PointF>) {
+    override fun accept(points: MutableList<PointF>) {
         viewModel.accept(points)
     }
 
-    fun setCenter(center: PointF) {
+    override fun setCenter(center: PointF) {
         viewModel.setCenter(center)
     }
 
