@@ -52,7 +52,13 @@ class MainActivity : AppCompatActivity(), PointsReceiver {
         findViewById<ImageButton>(R.id.saveButton).setOnClickListener{ saveLauncher.launch("Dummy") }
         findViewById<ImageButton>(R.id.exportButton).setOnClickListener{ exportLauncher.launch("Dummy") }
         //TODO!~ Right now, we only send the first 10 lines. Sharing may not be appropriate for the amount of data involved. Maybe send a binary instead of WaveFront.
-        findViewById<ImageButton>(R.id.shareButton).setOnClickListener{ shareLauncher.launch(viewModel.toWavefrontFormat().take(10)) }
+        findViewById<ImageButton>(R.id.shareButton).setOnClickListener{ shareLauncher.launch(
+            viewModel
+                .toWavefrontFormat()
+                .removeSubsequentDoubles()
+                .take(10)
+            )
+        }
     }
 
     override fun accept(points: MutableList<PointF>) {
