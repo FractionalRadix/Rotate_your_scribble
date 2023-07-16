@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity(), PointsReceiver {
     private val loadLauncher = registerForActivityResult(LoaderContract()) { uri -> load(uri) }
     private val saveLauncher = registerForActivityResult(SaverContract()) { uri -> save(uri) }
     private val exportLauncher = registerForActivityResult(ExporterContract()) { uri -> export(uri) }
+    private val shareLauncher = registerForActivityResult(SharerContract()) { }
 
     //TODO?~ See if we can have a launcher that does NOT require input (0 parameters instead of a dummy String parameter).
     //TODO?~ Use the default GetContent or OpenDocument contract?
@@ -80,6 +81,26 @@ class MainActivity : AppCompatActivity(), PointsReceiver {
         }
     }
 
+    class SharerContract : ActivityResultContract<List<String>, Uri?>() {
+        override fun createIntent(context: Context, input: List<String>): Intent {
+            val sharingIntent = Intent(Intent.ACTION_SEND)
+            sharingIntent.type = "text/plain"   // That apparently really IS the MIME Type for Wavefront.OBJ ....
+            //val textLines = viewModel
+            //    .toWavefrontFormat()
+            val textLines = input
+                .joinToString( separator = "\r\n" )
+            //TODO?~ The amount of data in even a simple scribble, causes the thing to crash:
+            //   Caused by: android.os.TransactionTooLargeException: data parcel size 2098740 bytes
+            sharingIntent.putExtra(Intent.EXTRA_TEXT, textLines)
+            return sharingIntent
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+            return intent?.data
+        }
+
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -104,7 +125,8 @@ class MainActivity : AppCompatActivity(), PointsReceiver {
         findViewById<ImageButton>(R.id.loadButton).setOnClickListener{ loadLauncher.launch("Dummy") }
         findViewById<ImageButton>(R.id.saveButton).setOnClickListener{ saveLauncher.launch("Dummy") }
         findViewById<ImageButton>(R.id.exportButton).setOnClickListener{ exportLauncher.launch("Dummy") }
-        findViewById<ImageButton>(R.id.shareButton).setOnClickListener{ share() }
+        //TODO!~ Right now, we only send the first 3 lines. Sharing may not be appropriate for the amount of data involved. Maybe send a binary instead of WaveFront.
+        findViewById<ImageButton>(R.id.shareButton).setOnClickListener{ shareLauncher.launch(viewModel.toWavefrontFormat().take(3)) }
     }
 
     override fun accept(points: MutableList<PointF>) {
@@ -119,22 +141,9 @@ class MainActivity : AppCompatActivity(), PointsReceiver {
         viewModel.clear()
     }
 
-    private val shareCode = 35
-    private fun share() {
-        val sharingIntent = Intent(Intent.ACTION_SEND)
-        sharingIntent.type = "text/plain"   // That apparently really IS the MIME Type for Wavefront.OBJ ....
-        val textLines = viewModel
-            .toWavefrontFormat()
-            .joinToString( separator = "\r\n" )
-        //TODO?~ The amount of data in even a simple scribble, causes the thing to crash... looks like a timeout.
-        sharingIntent.putExtra(Intent.EXTRA_TEXT, textLines)
-        startActivity(Intent.createChooser(sharingIntent, "Share using: "))
-    }
-
     private fun load(uri: Uri?) {
         if (uri != null) {
             //TODO!+ Handle FileNotFoundException and IOException.
-            //TODO!+ Handle parsing errors.
             val contentResolver = applicationContext.contentResolver
             val parcelFileDescriptor = contentResolver.openFileDescriptor(uri, "r")
             val fileReader = FileReader(parcelFileDescriptor?.fileDescriptor)
