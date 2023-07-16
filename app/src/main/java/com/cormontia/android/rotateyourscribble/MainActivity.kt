@@ -117,7 +117,9 @@ class MainActivity : AppCompatActivity(), PointsReceiver {
             val fileWriter = FileWriter(parcelFileDescriptor?.fileDescriptor)
             val bufferedWriter = BufferedWriter(fileWriter)
 
-            val textLines = viewModel.toWavefrontFormat()
+            val textLines = viewModel
+                .toWavefrontFormat()
+                .removeSubsequentDoubles()
             bufferedWriter.use {
                 //TODO!~ Currently stores as .obj.txt ...
                 textLines.forEach { line ->
@@ -127,39 +129,5 @@ class MainActivity : AppCompatActivity(), PointsReceiver {
 
             parcelFileDescriptor?.close()
         }
-    }
-
-    /**
-     * Given a
-     */
-    fun <T> Iterable<T>.filterSubsequentDoubles() {
-        val l = listOf<T>()
-        val l2 = l.take(3)
-        val l3 = l.filter { x -> true }
-    }
-
-    //TODO!+ Add unit tests.
-    fun removeDoubles(l: List<String>): List<String> {
-        var result = mutableListOf<String>()
-
-        if (l.isEmpty()) {
-            return result
-        }
-
-        if (l.size == 1) {
-            result.add(l[0])
-            return result
-        }
-
-        var curVal = l[0]
-        for (idx in 1..l.size) {
-            var nextVal = l[idx]
-            if (nextVal != curVal) {
-                result.add(nextVal)
-                curVal = nextVal
-            }
-        }
-
-        return result
     }
 }
