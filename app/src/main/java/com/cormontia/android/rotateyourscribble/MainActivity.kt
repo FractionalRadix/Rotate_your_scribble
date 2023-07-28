@@ -51,6 +51,7 @@ class MainActivity : AppCompatActivity(), PointsReceiver {
         findViewById<ImageButton>(R.id.loadButton).setOnClickListener{ loadLauncher.launch("Dummy") }
         findViewById<ImageButton>(R.id.saveButton).setOnClickListener{ saveLauncher.launch("Dummy") }
         findViewById<ImageButton>(R.id.exportButton).setOnClickListener{ exportLauncher.launch("Dummy") }
+        //TODO?~ Maybe remove the duplicates at the source, when CREATING the user's scribble...?
         //TODO!~ Right now, we only send the first 10 lines. Sharing may not be appropriate for the amount of data involved. Maybe send a binary instead of WaveFront.
         findViewById<ImageButton>(R.id.shareButton).setOnClickListener{ shareLauncher.launch(
             viewModel

@@ -20,6 +20,10 @@ class ViewInfo(
         private set
     var center: PointF
         private set
+    val contentWidth: Int
+        get() = rect.right - rect.left
+    val contentHeight: Int
+        get() = rect.bottom - rect.top
 
     init {
         val contentWidth = width - paddingLeft - paddingRight

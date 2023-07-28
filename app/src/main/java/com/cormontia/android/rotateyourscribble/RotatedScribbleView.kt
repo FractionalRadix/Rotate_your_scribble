@@ -69,11 +69,7 @@ class RotatedScribbleView : View {
         init(attrs, 0)
     }
 
-    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(
-        context,
-        attrs,
-        defStyle
-    ) {
+    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
         init(attrs, defStyle)
     }
 
@@ -204,18 +200,27 @@ class RotatedScribbleView : View {
             velocityX: Float,
             velocityY: Float,
         ): Boolean {
+            val relativeVelocityX = abs(velocityX / viewInfo!!.contentWidth) //TODO?~ What if viewInfo == null ?
+            val relativeVelocityY = abs(velocityY / viewInfo!!.contentHeight) //TODO?~ What if viewInfo == null ?
+
             val rightward = e2.x - e1.x
             val upward = e2.y - e1.y
             if (abs(rightward) > abs(upward)) {
+                //TODO?~ Instead of changing the duration, perhaps change the range (currently it moves one full circle).
+                // Right now, bigger velocity means longer duration... making it SLOWER...
                 if (rightward > 0) {
+                    rightwardAnimator.duration = (relativeVelocityX * 500).toLong()
                     rightwardAnimator.start()
                 } else {
+                    leftwardAnimator.duration = (relativeVelocityX * 500).toLong()
                     leftwardAnimator.start()
                 }
             } else {
                 if (upward > 0) {
+                    upwardAnimator.duration = (relativeVelocityY * 500).toLong()
                     upwardAnimator.start()
                 } else {
+                    downwardAnimator.duration = (relativeVelocityY * 500).toLong()
                     downwardAnimator.start()
                 }
             }
